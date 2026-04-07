@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\lokasiController;
 use App\Http\Controllers\roleController;
 use App\Http\Controllers\usersController;
+use App\Http\Controllers\picController;
+use App\Http\Controllers\packageController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -56,6 +58,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/package/{id}/edit', [packageController::class, 'edit'])->name('admin.package.edit');
         Route::put('/package/{id}', [packageController::class, 'update'])->name('admin.package.update');
         Route::delete('/package/{id}', [packageController::class, 'destroy'])->name('admin.package.destroy');
+
     });
 
     // Kasir Routes

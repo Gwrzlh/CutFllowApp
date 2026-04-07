@@ -14,33 +14,38 @@ class lokasiController extends Controller
     }
     public function create()
     {
-      return view('Admin.lokasi.create');
+      $lokasi = lokasi::all();
+      return view('Admin.lokasi.create', compact('lokasi'));
     }
+
     public function store(Request $request)
     {
       $lokasi = new lokasi();
       $lokasi->name = $request->name;
       $lokasi->Kabupaten = $request->Kabupaten;
       $lokasi->save();
-      return redirect()->route('admin.lokasi.index');
+      return redirect()->route('admin.lokasi.index')->with('success', 'Lokasi berhasil ditambahkan');
     }
+
     public function edit($id)
     {
-      $lokasi = lokasi::find($id);
-      return view('Admin.lokasi.update', compact('lokasi'));
+      $lokasi = lokasi::all();
+      $lokasi_edit = lokasi::find($id);
+      return view('Admin.lokasi.update', compact('lokasi', 'lokasi_edit'));
     }
+
     public function update(Request $request, $id)
     {
       $lokasi = lokasi::find($id);
       $lokasi->name = $request->name;
       $lokasi->Kabupaten = $request->Kabupaten;
       $lokasi->save();
-      return redirect()->route('admin.lokasi.index');
+      return redirect()->route('admin.lokasi.index')->with('success', 'Lokasi berhasil diperbarui');
     }
     public function destroy($id)
     {
       $lokasi = lokasi::find($id);
       $lokasi->delete();
-      return redirect()->route('admin.lokasi.index');
+      return redirect()->route('admin.lokasi.index')->with('success', 'Lokasi berhasil dihapus');
     }
 }

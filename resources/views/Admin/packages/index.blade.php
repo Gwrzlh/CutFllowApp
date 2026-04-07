@@ -7,19 +7,20 @@
     formData: {
         id: '{{ old('id') }}',
         name: '{{ old('name') }}',
-        Kabupaten: '{{ old('Kabupaten') }}'
+        price: '{{ old('price') }}',
+        description: '{{ old('description') }}'
     },
-    actionUrl: '{{ old('id') ? route('admin.lokasi.update', old('id')) : route('admin.lokasi.store') }}',
+    actionUrl: '{{ old('id') ? route('admin.package.update', old('id')) : route('admin.package.store') }}',
     editItem(item) {
         this.mode = 'edit';
-        this.formData = { id: item.id, name: item.name, Kabupaten: item.Kabupaten };
-        this.actionUrl = '{{ url('admin/lokasi') }}/' + item.id;
+        this.formData = { id: item.id, name: item.name, price: item.price, description: item.description };
+        this.actionUrl = '{{ url('admin/package') }}/' + item.id;
         this.openDrawer = true;
     },
     createItem() {
         this.mode = 'create';
-        this.formData = { id: '', name: '', Kabupaten: '' };
-        this.actionUrl = '{{ route('admin.lokasi.store') }}';
+        this.formData = { id: '', name: '', price: '', description: '' };
+        this.actionUrl = '{{ route('admin.package.store') }}';
         this.openDrawer = true;
     }
 }" class="space-y-10">
@@ -27,23 +28,21 @@
     <div class="flex items-start gap-4">
         <div class="p-3 bg-white rounded-xl shadow-sm border border-gray-100">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#0B224E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.102-1.101" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12l.01 0" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
         </div>
         <div>
-            <h1 class="text-2xl font-bold text-[#0B224E] tracking-tight whitespace-nowrap">Dashboard Link</h1>
-            <p class="text-sm text-gray-400 mt-1 whitespace-nowrap">Page Master Lokasi</p>
+            <h1 class="text-2xl font-bold text-[#0B224E] tracking-tight">Packages</h1>
+            <p class="text-sm text-gray-400 mt-1">Page Master Paket Layanan</p>
         </div>
     </div>
 
     <!-- Data Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-sm uppercase tracking-tight">
-        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white">
-            <h2 class="font-bold text-[#0B224E]">List Lokasi</h2>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-sm lowercase italic">
+        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white not-italic">
+            <h2 class="font-bold text-[#0B224E]">List Package</h2>
             <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[13px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
                 Tambah
@@ -51,30 +50,32 @@
         </div>
 
         <div class="p-0">
-            <div class="overflow-x-auto text-[13px]">
+            <div class="overflow-x-auto text-[13px] not-italic">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50/50 text-gray-400 italic">
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">No</th>
-                            <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Nama Lokasi</th>
-                            <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100 uppercase tracking-widest">Kabupaten</th>
+                            <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Nama Paket</th>
+                            <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Harga</th>
+                            <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Deskripsi</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        @foreach ($lokasi as $item)
+                    <tbody class="divide-y divide-gray-50 uppercase tracking-tight">
+                        @foreach ($package as $item)
                         <tr class="hover:bg-gray-50/30 transition-colors group">
                             <td class="px-8 py-5 text-gray-400 font-medium">{{ $loop->iteration }}</td>
-                            <td class="px-8 py-5 text-[#0B224E] font-bold capitalize">{{ $item->name }}</td>
-                            <td class="px-8 py-5 text-gray-500 font-medium uppercase tracking-widest">{{ $item->Kabupaten }}</td>
+                            <td class="px-8 py-5 text-[#0B224E] font-bold">{{ $item->name }}</td>
+                            <td class="px-8 py-5 text-[#1A337E] font-bold tracking-widest">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
+                            <td class="px-8 py-5 text-gray-500 font-medium normal-case italic line-clamp-1 max-w-[200px]">{{ $item->description }}</td>
                             <td class="px-8 py-5 text-right font-normal">
-                                <div class="flex items-center justify-end gap-3 font-normal">
+                                <div class="flex items-center justify-end gap-3">
                                     <button @click="editItem({{ json_encode($item) }})" class="p-2.5 text-gray-300 hover:text-[#1A337E] hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-gray-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1A337E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
-                                    <form action="{{ route('admin.lokasi.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus lokasi ini?')">
+                                    <form action="{{ route('admin.package.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus paket ini?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-2.5 text-gray-300 hover:text-red-500 hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-gray-100">
@@ -92,7 +93,7 @@
             </div>
             
             <div class="px-8 py-6 bg-white border-t border-gray-50 flex items-center justify-between">
-                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">Showing 1 to {{ $lokasi->count() }} of {{ $lokasi->count() }} entities</p>
+                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">Showing 1 to {{ $package->count() }} of {{ $package->count() }} entities</p>
                 <div class="flex items-center gap-2">
                     <button class="w-8 h-8 rounded-lg bg-[#1A337E] text-white text-[11px] font-bold shadow-sm">1</button>
                 </div>
@@ -101,19 +102,10 @@
     </div>
 
     <!-- Drawer Section -->
-    <div class="fixed inset-0 z-[60] overflow-hidden uppercase tracking-tight" 
-        x-show="openDrawer" 
-        x-cloak>
+    <div class="fixed inset-0 z-[60] overflow-hidden uppercase tracking-tight" x-show="openDrawer" x-cloak>
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/20 backdrop-blur-[2px] transition-opacity" 
-            x-show="openDrawer"
-            x-transition:enter="ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            @click="openDrawer = false"></div>
+            x-show="openDrawer" @click="openDrawer = false"></div>
 
         <div class="fixed inset-y-0 right-0 pl-10 max-w-full flex">
             <div class="w-screen max-w-md shadow-2xl transition-all"
@@ -135,7 +127,7 @@
                     <div class="flex-1 h-0 overflow-y-auto">
                         <!-- Drawer Header -->
                         <div class="px-8 py-6 bg-white border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
-                            <h2 class="text-lg font-bold text-[#0B224E]" x-text="mode === 'create' ? 'Form Add Lokasi' : 'Form Update Lokasi'"></h2>
+                            <h2 class="text-lg font-bold text-[#0B224E]" x-text="mode === 'create' ? 'Form Add Package' : 'Form Update Package'"></h2>
                             <button type="button" @click="openDrawer = false" class="p-2 text-gray-400 hover:text-[#0B224E] transition-colors rounded-lg hover:bg-gray-50">
                                 <svg class="h-5 w-5 text-[#0B224E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -147,18 +139,26 @@
                         <div class="px-8 py-10 space-y-8 font-normal">
                             <!-- Input Group -->
                             <div class="space-y-2 uppercase tracking-[0.2em]">
-                                <label for="name" class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Nama Lokasi</label>
-                                <input type="text" name="name" id="name" placeholder="Tulis Nama Lokasi" x-model="formData.name"
+                                <label for="pkg_name" class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Nama Paket</label>
+                                <input type="text" name="name" id="pkg_name" placeholder="Tulis Nama Paket" x-model="formData.name"
                                     class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E]" required>
                                 @error('name') <p class="text-red-500 text-[11px] mt-1 italic font-medium">{{ $message }}</p> @enderror
                             </div>
 
                             <!-- Input Group -->
                             <div class="space-y-2 uppercase tracking-[0.2em]">
-                                <label for="Kabupaten" class="block text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">Kabupaten</label>
-                                <input type="text" name="Kabupaten" id="Kabupaten" placeholder="Tulis Nama Kabupaten" x-model="formData.Kabupaten"
-                                    class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E]" required>
-                                @error('Kabupaten') <p class="text-red-500 text-[11px] mt-1 italic font-medium">{{ $message }}</p> @enderror
+                                <label for="price" class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Harga (Rp)</label>
+                                <input type="number" name="price" id="price" placeholder="Contoh: 500000" x-model="formData.price"
+                                    class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E] tracking-widest" required>
+                                @error('price') <p class="text-red-500 text-[11px] mt-1 italic font-medium">{{ $message }}</p> @enderror
+                            </div>
+
+                            <!-- Input Group -->
+                            <div class="space-y-2 uppercase tracking-[0.2em]">
+                                <label for="description" class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Deskripsi</label>
+                                <textarea name="description" id="description" rows="5" placeholder="Tulis deskripsi detail paket..." x-model="formData.description"
+                                    class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E] normal-case tracking-normal"></textarea>
+                                @error('description') <p class="text-red-500 text-[11px] mt-1 italic font-medium">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>
@@ -180,5 +180,3 @@
     </div>
 </div>
 @endsection
-
-

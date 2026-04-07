@@ -5,295 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Cutflow Photography</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        :root {
-            --primary-blue: #0A3D91; /* Biru sesuai mockup */
-            --gold: #D4AF37;
-            --text-main: #2D3436;
-            --text-muted: #636E72;
-            --bg-white: #FFFFFF;
-            --input-border: #E0E0E0;
-            --error-red: #D63031;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            background-color: #F5F6FA;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .login-container {
-            width: 90%;
-            max-width: 1000px;
-            height: 600px;
-            background: var(--bg-white);
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Sisi Kiri: Form */
-        .login-left {
-            flex: 1;
-            padding: 60px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .login-header h1 {
-            font-size: 24px;
-            color: var(--text-main);
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .login-header p {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 40px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--input-border);
-            border-radius: 10px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .input-wrapper input:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(10, 61, 145, 0.1);
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--text-muted);
-            font-size: 18px;
-            user-select: none;
-        }
-
-        .remember-forgot {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .remember-me input {
-            cursor: pointer;
-        }
-
-        .btn-login {
-            background-color: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .btn-login:hover {
-            background-color: #08347A;
-        }
-
-        .error-message {
-            color: var(--error-red);
-            font-size: 12px;
-            margin-top: 4px;
-            display: block;
-        }
-
-        /* Sisi Kanan: Brand */
-        .login-right {
-            flex: 1;
-            background-color: var(--primary-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
-        }
-
-        .brand-logo {
-            width: 80%;
-            max-width: 300px;
-            text-align: center;
-        }
-
-        .brand-logo img {
-            width: 100%;
-            height: auto;
-        }
-
-        /* Placeholder logo jika file tidak ada */
-        .logo-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--gold);
-        }
-
-        .logo-c {
-            font-size: 80px;
-            font-weight: 700;
-            border: 4px solid var(--gold);
-            width: 120px;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-
-        .logo-text {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-
-        .logo-subtext {
-            font-size: 12px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
-
-        @media (max-width: 768px) {
-            .login-container {
-                flex-direction: column;
-                height: auto;
-                max-width: 450px;
-            }
-            .login-right {
-                display: none;
-            }
-            .login-left {
-                padding: 40px 30px;
-            }
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body>
+<body class="bg-[#E9ECEF] h-screen flex items-center justify-center p-4">
 
-    <div class="login-container">
-        <!-- Sisi Kiri: Form -->
-        <div class="login-left">
-            <div class="login-header">
-                <h1>Selamat Datang</h1>
-                <p>Login to access your cutflow account</p>
+    <div class="bg-white w-full max-w-[1000px] h-[640px] rounded-[32px] flex shadow-2xl overflow-hidden">
+        
+        <div class="flex-[1.2] p-12 md:p-20 flex flex-col justify-center">
+            <div class="mb-10">
+                <h1 class="text-[22px] font-bold text-[#2D3436]">Selamat Datang</h1>
+                <p class="text-sm text-[#8E8E8E] mt-1">Login to access your cutflow account</p>
             </div>
 
-            <form action="{{ url('/login') }}" method="POST">
+            <form action="{{ url('/login') }}" method="POST" class="space-y-5">
                 @csrf
                 
-                <div class="form-group">
-                    <label for="email">Masukan Email</label>
-                    <div class="input-wrapper">
-                        <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
-                    </div>
+                <div>
+                    <label for="email" class="block text-[13px] font-medium text-[#2D3436] mb-2">Masukan Email</label>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" 
+                        placeholder="Tulis nama Customer" 
+                        class="w-full px-4 py-3.5 bg-[#FAFAFA] border border-[#E8E8E8] rounded-xl text-sm outline-none focus:border-[#083A92] focus:ring-1 focus:ring-[#083A92] transition-all"
+                        required autofocus>
                     @error('email')
-                        <span class="error-message">{{ $message }}</span>
+                        <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <div class="form-group">
-                    <label for="password">Kata Sandi</label>
-                    <div class="input-wrapper">
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                        <span class="toggle-password" id="togglePassword">👁️</span>
+                <div>
+                    <label for="password" class="block text-[13px] font-medium text-[#2D3436] mb-2">Kata Sandi</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" 
+                            placeholder="Kata Sandi" 
+                            class="w-full px-4 py-3.5 bg-[#FAFAFA] border border-[#E8E8E8] rounded-xl text-sm outline-none focus:border-[#083A92] focus:ring-1 focus:ring-[#083A92] transition-all"
+                            required>
+                        <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12.a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                        </button>
                     </div>
-                    @error('password')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
                 </div>
 
-                <div class="remember-forgot">
-                    <label class="remember-me">
-                        <input type="checkbox" name="remember" id="remember">
-                        <span>Remember me</span>
-                    </label>
+                <div class="flex items-center space-x-2 py-2">
+                    <input type="checkbox" name="remember" id="remember" class="w-4 h-4 rounded border-gray-300 text-[#083A92] focus:ring-[#083A92]">
+                    <label for="remember" class="text-[13px] text-[#2D3436] cursor-pointer">Remember me</label>
                 </div>
 
-                <button type="submit" class="btn-login">Login</button>
+                <button type="submit" class="w-full bg-[#083A92] hover:bg-[#062d70] text-white py-3.5 rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-blue-900/20">
+                    Login
+                </button>
             </form>
         </div>
 
-        <!-- Sisi Kanan: Brand -->
-        <div class="login-right">
-            <div class="brand-logo">
-                @if(file_exists(public_path('assets/logo-gold.png')))
-                    <img src="{{ asset('assets/logo-gold.png') }}" alt="Cutflow Logo">
-                @else
-                    <div class="logo-placeholder">
-                        <div class="logo-c">C</div>
-                        <div class="logo-text">cutflow.id</div>
-                        <div class="logo-subtext">PHOTOGRAPHY</div>
-                    </div>
-                @endif
+        <div class="hidden md:flex flex-1 bg-[#083A92] items-center justify-center p-12">
+            <div class="text-center w-full max-w-[320px]">
+                <img src="{{ asset('assets/480b035e892fbbee05ad71e6a2660e529696ac8d.png') }}" alt="Cutflow Logo" class="w-full h-auto drop-shadow-2xl">
             </div>
         </div>
     </div>
 
     <script>
         const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
+        const passwordInput = document.querySelector('#password');
 
-        togglePassword.addEventListener('click', function (e) {
-            // toggle the type attribute
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            // toggle the eye icon
-            this.textContent = type === 'password' ? '👁️' : '🔒';
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
         });
     </script>
 </body>

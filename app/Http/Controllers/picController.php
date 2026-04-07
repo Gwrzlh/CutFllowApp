@@ -4,46 +4,54 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\models\photographer;
+use App\models\lokasi;
 
 class picController extends Controller
 {
     public function index()
     {
         $photographer = photographer::with('lokasi')->get();
-        return view('Admin.photographer.index', compact('photographer'));
+        return view('Admin.pic.index', compact('photographer'));
     }
     public function create()
     {
+        $photographer = photographer::with('lokasi')->get();
         $lokasi = lokasi::all();
-        return view('Admin.photographer.create', compact('lokasi'));
+        return view('Admin.pic.create', compact('photographer', 'lokasi'));
     }
+
+    public function edit($id)
+    {
+        $photographer = photographer::with('lokasi')->get();
+        $lokasi = lokasi::all();
+        $pic = photographer::find($id);
+        return view('Admin.pic.update', compact('photographer', 'lokasi', 'pic'));
+    }
+
     public function store(Request $request)
     {
         $photographer = new photographer();
         $photographer->name = $request->name;
-        $photographer->lokasi_id = $request->lokasi_id;
+        $photographer->location_id = $request->location_id;
         $photographer->phone = $request->phone;
         $photographer->save();
-        return redirect()->route('admin.photographer.index');
+        return redirect()->route('admin.pic.index')->with('success', 'PIC berhasil ditambahkan');
     }
-    public function edit($id)
-    {
-        $photographer = photographer::find($id);
-        return view('Admin.photographer.update', compact('photographer'));
-    }
+
     public function update(Request $request, $id)
     {
         $photographer = photographer::find($id);
         $photographer->name = $request->name;
-        $photographer->lokasi_id = $request->lokasi_id;
+        $photographer->location_id = $request->location_id;
         $photographer->phone = $request->phone;
         $photographer->save();
-        return redirect()->route('admin.photographer.index');
+        return redirect()->route('admin.pic.index')->with('success', 'PIC berhasil diperbarui');
     }
     public function destroy($id)
     {
         $photographer = photographer::find($id);
         $photographer->delete();
-        return redirect()->route('admin.photographer.index');
+        return redirect()->route('admin.pic.index')->with('success', 'PIC berhasil dihapus');
     }
 }
+
