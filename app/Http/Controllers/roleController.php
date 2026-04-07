@@ -13,19 +13,6 @@ class roleController extends Controller
         $role = Role::all();
         return view('Admin.role.index', compact('role'));
     }
-    public function create()
-    {
-        $role = Role::all();
-        return view('Admin.role.create', compact('role'));
-    }
-
-    public function edit($id)
-    {
-        $role = Role::all();
-        $role_edit = role::find($id);
-        return view('Admin.role.update', compact('role', 'role_edit'));
-    }
-
     public function store(Request $request)
     {
         $role = new Role();
@@ -34,7 +21,6 @@ class roleController extends Controller
         $role->save();
         return redirect()->route('admin.role.index')->with('success', 'Role berhasil ditambahkan');
     }
-
     public function update(Request $request, $id)
     {
         $role = Role::find($id);

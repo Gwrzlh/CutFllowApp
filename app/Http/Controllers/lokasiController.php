@@ -12,12 +12,6 @@ class lokasiController extends Controller
       $lokasi = lokasi::all();
       return view('Admin.lokasi.index', compact('lokasi'));
     }
-    public function create()
-    {
-      $lokasi = lokasi::all();
-      return view('Admin.lokasi.create', compact('lokasi'));
-    }
-
     public function store(Request $request)
     {
       $lokasi = new lokasi();
@@ -26,14 +20,6 @@ class lokasiController extends Controller
       $lokasi->save();
       return redirect()->route('admin.lokasi.index')->with('success', 'Lokasi berhasil ditambahkan');
     }
-
-    public function edit($id)
-    {
-      $lokasi = lokasi::all();
-      $lokasi_edit = lokasi::find($id);
-      return view('Admin.lokasi.update', compact('lokasi', 'lokasi_edit'));
-    }
-
     public function update(Request $request, $id)
     {
       $lokasi = lokasi::find($id);

@@ -11,7 +11,8 @@ class picController extends Controller
     public function index()
     {
         $photographer = photographer::with('lokasi')->get();
-        return view('Admin.pic.index', compact('photographer'));
+        $lokasi = lokasi::all();
+        return view('Admin.pic.index', compact('photographer', 'lokasi'));
     }
     public function create()
     {

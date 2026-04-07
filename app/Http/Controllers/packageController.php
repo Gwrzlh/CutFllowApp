@@ -13,12 +13,6 @@ class packageController extends Controller
         $package = packages::all();
         return view('Admin.packages.index', compact('package'));
     }
-    public function create()
-    {
-        $package = packages::all();
-        return view('Admin.packages.create', compact('package'));
-    }
-
     public function store(Request $request)
     {
         $package = new packages();
@@ -28,14 +22,6 @@ class packageController extends Controller
         $package->save();
         return redirect()->route('admin.package.index')->with('success', 'Paket berhasil ditambahkan');
     }
-
-    public function edit($id)
-    {
-        $package = packages::all();
-        $package_edit = packages::find($id); // Using _edit for consistency in Drawer controllers
-        return view('Admin.packages.update', compact('package', 'package_edit'));
-    }
-
     public function update(Request $request, $id)
     {
         $package = packages::find($id);
