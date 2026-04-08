@@ -85,7 +85,8 @@
                             <td class="px-8 py-6">
                                 <div class="flex flex-col">
                                     <span class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded w-fit mb-1">{{ $transaction->invoice_number }}</span>
-                                    <span class="text-xs text-gray-400 font-medium">{{ Carbon\Carbon::parse($transaction->execution_date)->format('d M Y') }}</span>
+                                    <span class="text-xs text-[#0B224E] font-bold italic">Audit: {{ $transaction->created_at->format('d M Y H:i') }}</span>
+                                    <span class="text-[10px] text-gray-400 font-medium mt-1 uppercase tracking-tighter">Eksekusi: {{ Carbon\Carbon::parse($transaction->execution_date)->format('d M Y') }}</span>
                                 </div>
                             </td>
                             <td class="px-8 py-6">

@@ -71,10 +71,10 @@ class OwnerController extends Controller
 
         // Date Range
         if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('execution_date', [$request->start_date, $request->end_date]);
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
         }
 
-        $transactions = $query->orderBy('execution_date', 'desc')->paginate(10);
+        $transactions = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('Owner.TransactionAudit', compact('transactions'));
     }
@@ -147,7 +147,7 @@ class OwnerController extends Controller
         }
 
         if ($request->filled('start_date') && $request->filled('end_date')) {
-            $query->whereBetween('execution_date', [$request->start_date, $request->end_date]);
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
         }
 
         $transactions = $query->get();
@@ -162,7 +162,7 @@ class OwnerController extends Controller
             "Expires"             => "0"
         ];
 
-        $columns = ['Invoice', 'Customer', 'Paket', 'Photographer', 'Tanggal Eksekusi', 'Total Amount', 'Status Pembayaran', 'Status Booking'];
+        $columns = ['Invoice', 'Customer', 'Paket', 'Photographer', 'Tanggal Transaksi', 'Tanggal Eksekusi', 'Total Amount', 'Status Pembayaran', 'Status Booking'];
 
         $callback = function() use($transactions, $columns) {
             $file = fopen('php://output', 'w');
@@ -174,6 +174,7 @@ class OwnerController extends Controller
                     $transaction->customer_name,
                     $transaction->package->name ?? '-',
                     $transaction->photographer->name ?? '-',
+                    $transaction->created_at->format('Y-m-d H:i:s'),
                     $transaction->execution_date,
                     $transaction->total_amount,
                     $transaction->payment_status,
