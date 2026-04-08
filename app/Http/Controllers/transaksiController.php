@@ -82,6 +82,13 @@ class transaksiController extends Controller
             $transaction->update(['invoice_number' => 'INV-' . str_pad($transaction->id, 5, '0', STR_PAD_LEFT)]);
 
             DB::commit();
+
+            LogActivity::create([
+                'user_id' => Auth::id(),
+                'action' => 'Melakukan transaksi baru: ' . $transaction->invoice_number,
+                'module' => 'Transactions'
+            ]);
+
             return redirect()->back()->with('success', 'Booking #' . $transaction->invoice_number . ' Berhasil!')->with('print_id', $transaction->id);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -110,6 +117,13 @@ class transaksiController extends Controller
             ]);
 
             DB::commit();
+
+            LogActivity::create([
+                'user_id' => Auth::id(),
+                'action' => 'Membatalkan transaksi: ' . $transaction->invoice_number,
+                'module' => 'Transactions'
+            ]);
+
             return redirect()->back()->with('success', "Booking dibatalkan. Dana yang dikembalikan ke customer: Rp " . number_format($refundAmount))->with('print_id', $transaction->id);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -132,6 +146,12 @@ class transaksiController extends Controller
                 'payment_status' => 'paid_off',
                 'booking_status' => 'completed',
                 'cash_change' => ($request->cash_received ?? $request->amount_paid) - $request->amount_paid,
+            ]);
+
+            LogActivity::create([
+                'user_id' => Auth::id(),
+                'action' => 'Melunasi transaksi: ' . $transaction->invoice_number,
+                'module' => 'Transactions'
             ]);
 
             return redirect()->back()->with('success', 'Pelunasan berhasil!')->with('print_id', $transaction->id);

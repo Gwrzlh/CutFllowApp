@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\packages;
 use App\Models\photographer;
+use App\Models\LogActivity;
+use Illuminate\Support\Facades\Auth;
 
 class packageController extends Controller
 {
@@ -31,6 +33,13 @@ class packageController extends Controller
         $package->description = $request->description;
         $package->is_active = $request->status;
         $package->save();
+        
+        LogActivity::create([
+            'user_id' => Auth::id(),
+            'action' => 'Menambahkan paket baru: ' . $package->name,
+            'module' => 'Data Master'
+        ]);
+
         return redirect()->route('admin.package.index')->with('success', 'Paket berhasil ditambahkan');
     }
     public function update(Request $request, $id)
@@ -41,12 +50,27 @@ class packageController extends Controller
         $package->description = $request->description;
         $package->is_active = $request->status;
         $package->save();
+        
+        LogActivity::create([
+            'user_id' => Auth::id(),
+            'action' => 'Mengubah data paket: ' . $package->name,
+            'module' => 'Data Master'
+        ]);
+
         return redirect()->route('admin.package.index')->with('success', 'Paket berhasil diperbarui');
     }
     public function destroy($id)
     {
         $package = packages::find($id);
+        $name = $package->name;
         $package->delete();
+        
+        LogActivity::create([
+            'user_id' => Auth::id(),
+            'action' => 'Menghapus paket: ' . $name,
+            'module' => 'Data Master'
+        ]);
+
         return redirect()->route('admin.package.index')->with('success', 'Paket berhasil dihapus');
     }
 }

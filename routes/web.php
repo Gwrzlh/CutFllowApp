@@ -88,6 +88,8 @@ Route::middleware(['auth'])->group(function () {
             
             Route::get('/assets/packages', [OwnerController::class, 'auditAssetsPackages'])->name('owner.audit.packages');
             Route::get('/assets/photographers', [OwnerController::class, 'auditAssetsPhotographer'])->name('owner.audit.photographers');
+            
+            Route::get('/activities', [OwnerController::class, 'activitiesAudit'])->name('owner.audit.activities');
         });
     });
 

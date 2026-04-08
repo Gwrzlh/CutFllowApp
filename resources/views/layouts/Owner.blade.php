@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -75,6 +76,14 @@
                                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                         <span x-show="sidebarOpen" class="font-medium whitespace-nowrap">Audit Users</span>
+                    </a>
+
+                    <a href="{{ route('owner.audit.activities') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group {{ request()->routeIs('owner.audit.activities') ? 'bg-[#D4AF37] text-white shadow-lg' : 'text-gray-400 hover:bg-white/10 hover:text-white' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="font-medium whitespace-nowrap">Log Activities</span>
                     </a>
 
                     <div class="space-y-1">
@@ -160,27 +169,103 @@
             </header>
 
             <main class="p-8">
-                @if (session('success'))
-                    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition
-                        class="bg-white border-l-4 border-green-500 p-4 rounded-xl shadow-sm mb-6 flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-green-100 p-2 rounded-lg text-green-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <span class="text-sm text-gray-600 font-medium">{{ session('success') }}</span>
-                        </div>
-                        <button @click="show = false" class="text-gray-400 hover:text-gray-600">&times;</button>
-                    </div>
-                @endif
-
                 @yield('content')
             </main>
         </div>
     </div>
 
+    <!-- Alert System Global -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // SweetAlert for Session Success
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: "{{ session('success') }}",
+                    confirmButtonColor: '#0B224E',
+                    background: '#ffffff',
+                    color: '#0B224E',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl border border-gray-100',
+                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                    }
+                });
+            @endif
+
+            // SweetAlert for Session Error
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan',
+                    text: "{{ session('error') }}",
+                    confirmButtonColor: '#0B224E',
+                    background: '#ffffff',
+                    color: '#0B224E',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl border border-gray-100',
+                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                    }
+                });
+            @endif
+
+            // Global Confirmation Delete Alert
+            document.querySelectorAll('form').forEach(form => {
+                if (form.getAttribute('onsubmit') && form.getAttribute('onsubmit').includes('confirm')) {
+                    let confirmText = form.getAttribute('onsubmit').match(/'([^']+)'/);
+                    let message = confirmText ? confirmText[1] : 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+                    
+                    // Remove default onsubmit
+                    form.removeAttribute('onsubmit');
+                    
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        Swal.fire({
+                            title: 'Konfirmasi',
+                            text: message,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#0B224E', // Brand color
+                            cancelButtonColor: '#EF4444', // Red for cancel
+                            confirmButtonText: 'Ya',
+                            cancelButtonText: 'Tidak',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl border border-gray-100 pb-4',
+                                confirmButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-wider text-xs',
+                                cancelButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-wider text-xs'
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Add loading state to all buttons in this form
+                                const buttons = form.querySelectorAll('button[type="submit"]');
+                                buttons.forEach(btn => {
+                                    btn.disabled = true;
+                                    btn.innerHTML = '<span class="flex items-center gap-2"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...</span>';
+                                });
+                                form.submit();
+                            }
+                        });
+                    });
+                } else if(form.method.toLowerCase() === 'post') {
+                    // Overload Request Protection (Double Submit Prevention)
+                    form.addEventListener('submit', function() {
+                        // Jangan double trigger jika sudah diproses oleh swal
+                        if (!form.hasAttribute('data-submitting')) {
+                            form.setAttribute('data-submitting', 'true');
+                            const buttons = form.querySelectorAll('button[type="submit"]:not(.ignore-loading)');
+                            buttons.forEach(btn => {
+                                btn.disabled = true;
+                                const originalText = btn.innerHTML;
+                                btn.setAttribute('data-original', originalText);
+                                btn.innerHTML = '<span class="flex items-center gap-2 justify-center"><svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Loading...</span>';
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

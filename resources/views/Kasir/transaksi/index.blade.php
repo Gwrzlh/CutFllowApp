@@ -313,15 +313,14 @@
                 
                 // Alert khusus jika popup diblokir
                 if (!win || win.closed || typeof win.closed == 'undefined') {
-                    alert("Pencetakan struk otomatis diblokir browser. Silakan klik 'Izinkan Pop-up' di pojok kanan atas browser atau cetak manual melalui tabel riwayat.");
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Pop-up Diblokir',
+                        text: "Pencetakan struk otomatis diblokir browser. Silakan klik 'Izinkan Pop-up' di pojok kanan atas browser atau cetak manual melalui tabel riwayat.",
+                        confirmButtonColor: '#0B224E'
+                    });
                 }
             }, 500); 
-        @endif
-        @if(session('success'))
-            alert("{{ session('success') }}");
-        @endif
-        @if(session('error'))
-            alert("{{ session('error') }}");
         @endif
     });
 

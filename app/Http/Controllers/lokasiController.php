@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\lokasi;
+use App\Models\LogActivity;
+use Illuminate\Support\Facades\Auth;
 
 class lokasiController extends Controller
 {
@@ -28,6 +30,13 @@ class lokasiController extends Controller
       $lokasi->name = $request->name;
       $lokasi->Kabupaten = $request->Kabupaten;
       $lokasi->save();
+      
+      LogActivity::create([
+          'user_id' => Auth::id(),
+          'action' => 'Menambahkan lokasi baru: ' . $lokasi->name,
+          'module' => 'Data Master'
+      ]);
+
       return redirect()->route('admin.lokasi.index')->with('success', 'Lokasi berhasil ditambahkan');
     }
     public function update(Request $request, $id)
@@ -36,12 +45,27 @@ class lokasiController extends Controller
       $lokasi->name = $request->name;
       $lokasi->Kabupaten = $request->Kabupaten;
       $lokasi->save();
+      
+      LogActivity::create([
+          'user_id' => Auth::id(),
+          'action' => 'Mengubah data lokasi: ' . $lokasi->name,
+          'module' => 'Data Master'
+      ]);
+
       return redirect()->route('admin.lokasi.index')->with('success', 'Lokasi berhasil diperbarui');
     }
     public function destroy($id)
     {
       $lokasi = lokasi::find($id);
+      $name = $lokasi->name;
       $lokasi->delete();
+      
+      LogActivity::create([
+          'user_id' => Auth::id(),
+          'action' => 'Menghapus data lokasi: ' . $name,
+          'module' => 'Data Master'
+      ]);
+
       return redirect()->route('admin.lokasi.index')->with('success', 'Lokasi berhasil dihapus');
     }
 }

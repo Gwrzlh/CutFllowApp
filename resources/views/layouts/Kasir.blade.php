@@ -13,6 +13,7 @@
         rel="stylesheet">
 
     <!-- Tailwind CSS (via Vite) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Alpine.js for interactivity -->
@@ -145,32 +146,7 @@
 
             <!-- Page Content -->
             <main class="p-8">
-                <!-- Session Alerts -->
-                @if (session('success'))
-                    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" 
-                        x-transition:enter="transform transition ease-out duration-300"
-                        x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-                        x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
-                        x-transition:leave="transition ease-in duration-100"
-                        x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0"
-                        class="fixed bottom-10 right-10 z-[100] max-w-sm w-full bg-white rounded-2xl shadow-2xl border-l-[6px] border-[#10B981] p-5 flex items-center gap-4">
-                        <div class="flex-shrink-0 w-10 h-10 bg-[#10B981]/10 rounded-xl flex items-center justify-center">
-                            <svg class="h-6 w-6 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-[#0B224E] uppercase tracking-wider">Success</p>
-                            <p class="text-xs text-gray-400 font-normal mt-0.5 leading-relaxed">{{ session('success') }}</p>
-                        </div>
-                        <button @click="show = false" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                @endif
+                <!-- Session Alerts (MIGRATED TO SWEETALERT in JS) -->
 
                 @yield('content')
             </main>
@@ -180,6 +156,94 @@
         </div>
     </div>
 
+    <!-- Alert System Global -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // SweetAlert for Session Success
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: "{{ session('success') }}",
+                    confirmButtonColor: '#0B224E',
+                    background: '#ffffff',
+                    color: '#0B224E',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl border border-gray-100',
+                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                    }
+                });
+            @endif
+
+            // SweetAlert for Session Error
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan',
+                    text: "{{ session('error') }}",
+                    confirmButtonColor: '#0B224E',
+                    background: '#ffffff',
+                    color: '#0B224E',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl border border-gray-100',
+                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                    }
+                });
+            @endif
+
+            // Global Confirmation Delete Alert
+            document.querySelectorAll('form').forEach(form => {
+                if (form.getAttribute('onsubmit') && form.getAttribute('onsubmit').includes('confirm')) {
+                    let confirmText = form.getAttribute('onsubmit').match(/'([^']+)'/);
+                    let message = confirmText ? confirmText[1] : 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+                    
+                    form.removeAttribute('onsubmit');
+                    
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Konfirmasi',
+                            text: message,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#0B224E', // Brand color
+                            cancelButtonColor: '#EF4444', // Red for cancel
+                            confirmButtonText: 'Ya',
+                            cancelButtonText: 'Tidak',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl border border-gray-100 pb-4',
+                                confirmButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-wider text-xs',
+                                cancelButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-wider text-xs'
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const buttons = form.querySelectorAll('button[type="submit"]');
+                                buttons.forEach(btn => {
+                                    btn.disabled = true;
+                                    btn.innerHTML = '<span class="flex items-center gap-2"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...</span>';
+                                });
+                                form.submit();
+                            }
+                        });
+                    });
+                } else if(form.method.toLowerCase() === 'post') {
+                    // Overload Request Protection
+                    form.addEventListener('submit', function() {
+                        if (!form.hasAttribute('data-submitting')) {
+                            form.setAttribute('data-submitting', 'true');
+                            const buttons = form.querySelectorAll('button[type="submit"]:not(.ignore-loading)');
+                            buttons.forEach(btn => {
+                                btn.disabled = true;
+                                const originalText = btn.innerHTML;
+                                btn.setAttribute('data-original', originalText);
+                                btn.innerHTML = '<span class="flex items-center gap-2 justify-center"><svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...</span>';
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

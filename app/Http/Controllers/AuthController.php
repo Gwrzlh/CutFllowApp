@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\LogActivity;
 
 class AuthController extends Controller
 {
@@ -45,6 +46,12 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
+            LogActivity::create([
+                'user_id' => $user->id,
+                'action' => 'Melakukan Login',
+                'module' => 'Authentication'
+            ]);
+
             return $this->redirectBasedOnRole($user);
         }
 
@@ -77,6 +84,14 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        if (Auth::check()) {
+            LogActivity::create([
+                'user_id' => Auth::id(),
+                'action' => 'Melakukan Logout',
+                'module' => 'Authentication'
+            ]);
+        }
+        
         Auth::logout();
 
         $request->session()->invalidate();

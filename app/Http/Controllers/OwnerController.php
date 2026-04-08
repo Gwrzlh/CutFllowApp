@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Transaction;
 use App\Models\packages;
 use App\Models\photographer;
+use App\Models\LogActivity;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -186,5 +187,31 @@ class OwnerController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function activitiesAudit(Request $request)
+    {
+        $query = LogActivity::with('user');
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('action', 'LIKE', "%{$search}%")
+                  ->orWhere('module', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function($u) use ($search) {
+                      $u->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        // Date Range
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [$request->start_date . ' 00:00:00', $request->end_date . ' 23:59:59']);
+        }
+
+        $activities = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('Owner.ActivitiesAudit', compact('activities'));
     }
 }
