@@ -66,6 +66,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', function () {
             return view('Kasir.dashboard');
         })->name('kasir.dashboard');
+
+        Route::get('/transaksi', [App\Http\Controllers\transaksiController::class, 'index'])->name('kasir.transaksi.index');
+        Route::post('/transaksi', [App\Http\Controllers\transaksiController::class, 'store'])->name('admin.transactions.store');
+        Route::put('/transaksi/{id}', [App\Http\Controllers\transaksiController::class, 'update'])->name('admin.transactions.update');
+        Route::put('/transaksi/{id}/cancel', [App\Http\Controllers\transaksiController::class, 'cancel'])->name('admin.transactions.cancel');
+        Route::get('/transaksi/{id}/print', [App\Http\Controllers\transaksiController::class, 'printInvoice'])->name('admin.transactions.print');
+
+        Route::get('/riwayat', [App\Http\Controllers\transaksiController::class, 'riwayat'])->name('kasir.riwayat.index');
     });
 
     // Owner Routes
