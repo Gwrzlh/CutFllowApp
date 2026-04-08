@@ -7,9 +7,19 @@ use App\Models\lokasi;
 
 class lokasiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-      $lokasi = lokasi::all();
+      $query = lokasi::query();
+
+      if ($request->filled('search')) {
+          $search = $request->search;
+          $query->where(function($q) use ($search) {
+              $q->where('name', 'LIKE', "%{$search}%")
+                ->orWhere('Kabupaten', 'LIKE', "%{$search}%");
+          });
+      }
+
+      $lokasi = $query->paginate(10);
       return view('Admin.lokasi.index', compact('lokasi'));
     }
     public function store(Request $request)

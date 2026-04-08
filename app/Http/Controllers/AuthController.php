@@ -31,9 +31,21 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->has('remember'))) {
+            $user = Auth::user();
+            
+            if ($user->status !== 'active') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                
+                return back()->withErrors([
+                    'email' => 'Akun Anda sudah tidak aktif. Silakan hubungi Administrator.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
-            return $this->redirectBasedOnRole(Auth::user());
+            return $this->redirectBasedOnRole($user);
         }
 
         return back()->withErrors([

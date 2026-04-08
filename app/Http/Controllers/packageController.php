@@ -8,9 +8,19 @@ use App\Models\photographer;
 
 class packageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $package = packages::all();
+        $query = packages::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $package = $query->paginate(10);
         return view('Admin.packages.index', compact('package'));
     }
     public function store(Request $request)
@@ -19,6 +29,7 @@ class packageController extends Controller
         $package->name = $request->name;
         $package->price = $request->price;
         $package->description = $request->description;
+        $package->is_active = $request->status;
         $package->save();
         return redirect()->route('admin.package.index')->with('success', 'Paket berhasil ditambahkan');
     }
@@ -28,6 +39,7 @@ class packageController extends Controller
         $package->name = $request->name;
         $package->price = $request->price;
         $package->description = $request->description;
+        $package->is_active = $request->status;
         $package->save();
         return redirect()->route('admin.package.index')->with('success', 'Paket berhasil diperbarui');
     }

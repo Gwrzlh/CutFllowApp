@@ -8,9 +8,15 @@ use Illuminate\Support\Str;
 
 class roleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $role = Role::all();
+        $query = Role::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'LIKE', "%{$request->search}%");
+        }
+
+        $role = $query->paginate(10);
         return view('Admin.role.index', compact('role'));
     }
     public function store(Request $request)

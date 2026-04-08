@@ -8,9 +8,25 @@ use App\models\lokasi;
 
 class picController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $photographer = photographer::with('lokasi')->get();
+        $query = photographer::with('lokasi');
+
+        // Search Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('phone', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Location Filter (Kabupaten)
+        if ($request->filled('location_id')) {
+            $query->where('location_id', $request->location_id);
+        }
+
+        $photographer = $query->paginate(10);
         $lokasi = lokasi::all();
         return view('Admin.pic.index', compact('photographer', 'lokasi'));
     }

@@ -8,18 +8,19 @@
         id: '{{ old('id') }}',
         name: '{{ old('name') }}',
         price: '{{ old('price') }}',
-        description: '{{ old('description') }}'
+        description: '{{ old('description') }}',
+        status: '{{ old('status') }}'
     },
     actionUrl: '{{ old('id') ? route('admin.package.update', old('id')) : route('admin.package.store') }}',
     editItem(item) {
         this.mode = 'edit';
-        this.formData = { id: item.id, name: item.name, price: item.price, description: item.description };
-        this.actionUrl = '{{ url('admin/package') }}/' + item.id;
+        this.formData = { id: item.id, name: item.name, price: item.price, description: item.description, status: item.is_active };
+        this.actionUrl = '{{ route('admin.package.index') }}/' + item.id;
         this.openDrawer = true;
     },
     createItem() {
         this.mode = 'create';
-        this.formData = { id: '', name: '', price: '', description: '' };
+        this.formData = { id: '', name: '', price: '', description: '', status: '' };
         this.actionUrl = '{{ route('admin.package.store') }}';
         this.openDrawer = true;
     }
@@ -38,14 +39,31 @@
     </div>
 
     <!-- Data Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-sm lowercase italic">
-        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white not-italic">
-            <h2 class="font-bold text-[#0B224E]">List Package</h2>
-            <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[13px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-sm uppercase italic">
+        <div class="px-8 py-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white not-italic">
+            <div class="flex flex-col md:flex-row items-center gap-4 flex-1">
+                <h2 class="font-bold text-[#0B224E] whitespace-nowrap">List Package</h2>
+                
+                <!-- Search Form -->
+                <form action="{{ route('admin.package.index') }}" method="GET" class="flex items-center gap-3 w-full max-w-xl text-left">
+                    <div class="relative w-full">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search package name or description..." 
+                            class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-medium">
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <button type="submit" class="hidden">Search</button>
+                </form>
+            </div>
+
+            <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[11px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest whitespace-nowrap">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                Tambah
+                Tambah Paket
             </button>
         </div>
 
@@ -56,20 +74,32 @@
                         <tr class="bg-gray-50/50 text-gray-400 italic">
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">No</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Nama Paket</th>
+                            <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Status</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Harga</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Deskripsi</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 uppercase tracking-tight">
-                        @foreach ($package as $item)
+                    <tbody class="divide-y divide-gray-50 uppercase tracking-tight font-bold whitespace-nowrap">
+                        @forelse ($package as $item)
                         <tr class="hover:bg-gray-50/30 transition-colors group">
-                            <td class="px-8 py-5 text-gray-400 font-medium">{{ $loop->iteration }}</td>
+                            <td class="px-8 py-5 text-gray-400 font-medium whitespace-normal">{{ ($package->currentPage() - 1) * $package->perPage() + $loop->iteration }}</td>
                             <td class="px-8 py-5 text-[#0B224E] font-bold">{{ $item->name }}</td>
-                            <td class="px-8 py-5 text-[#1A337E] font-bold tracking-widest">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
-                            <td class="px-8 py-5 text-gray-500 font-medium normal-case italic line-clamp-1 max-w-[200px]">{{ $item->description }}</td>
+                            <td class="px-8 py-5">
+                                @if($item->is_active === 1)
+                                    <span class="px-3 py-1 bg-green-50 text-green-600 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-green-100">
+                                        Active
+                                    </span>
+                                @else
+                                    <span class="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-red-100">
+                                        Inactive
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-8 py-5 text-[#1A337E] font-bold tracking-widest uppercase">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
+                            <td class="px-8 py-5 text-gray-500 font-medium normal-case italic line-clamp-1 max-w-[200px] whitespace-normal">{{ $item->description }}</td>
                             <td class="px-8 py-5 text-right font-normal">
-                                <div class="flex items-center justify-end gap-3">
+                                <div class="flex items-center justify-end gap-3 font-normal">
                                     <button @click="editItem({{ json_encode($item) }})" class="p-2.5 text-gray-300 hover:text-[#1A337E] hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-gray-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1A337E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -87,15 +117,22 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr class="not-italic">
+                            <td colspan="6" class="px-8 py-10 text-center text-gray-400 italic">No packages found.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
             
-            <div class="px-8 py-6 bg-white border-t border-gray-50 flex items-center justify-between">
-                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">Showing 1 to {{ $package->count() }} of {{ $package->count() }} entities</p>
-                <div class="flex items-center gap-2">
-                    <button class="w-8 h-8 rounded-lg bg-[#1A337E] text-white text-[11px] font-bold shadow-sm">1</button>
+            <!-- Pagination -->
+            <div class="px-8 py-6 bg-white border-t border-gray-50 flex flex-col md:flex-row items-center justify-between gap-4 not-italic">
+                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">
+                    Showing {{ $package->firstItem() ?? 0 }} to {{ $package->lastItem() ?? 0 }} of {{ $package->total() }} entities
+                </p>
+                <div class="custom-pagination">
+                    {{ $package->appends(request()->query())->links('pagination::tailwind') }}
                 </div>
             </div>
         </div>
@@ -159,6 +196,13 @@
                                 <textarea name="description" id="description" rows="5" placeholder="Tulis deskripsi detail paket..." x-model="formData.description"
                                     class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E] normal-case tracking-normal"></textarea>
                                 @error('description') <p class="text-red-500 text-[11px] mt-1 italic font-medium">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                               <label for="status" class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Status</label>
+                               <select name="status" id="status" x-model="formData.status" class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E] tracking-widest">
+                                   <option value="1">Active</option>
+                                   <option value="0">Inactive</option>
+                               </select> 
                             </div>
                         </div>
                     </div>

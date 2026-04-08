@@ -13,7 +13,7 @@
     editItem(item) {
         this.mode = 'edit';
         this.formData = { id: item.id, name: item.name, Kabupaten: item.Kabupaten };
-        this.actionUrl = '{{ url('admin/lokasi') }}/' + item.id;
+        this.actionUrl = '{{ route('admin.lokasi.index') }}/' + item.id;
         this.openDrawer = true;
     },
     createItem() {
@@ -40,13 +40,30 @@
 
     <!-- Data Card -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-sm uppercase tracking-tight">
-        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white">
-            <h2 class="font-bold text-[#0B224E]">List Lokasi</h2>
-            <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[13px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="px-8 py-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
+            <div class="flex flex-col md:flex-row items-center gap-4 flex-1">
+                <h2 class="font-bold text-[#0B224E] whitespace-nowrap">List Lokasi</h2>
+                
+                <!-- Search Form -->
+                <form action="{{ route('admin.lokasi.index') }}" method="GET" class="flex items-center gap-3 w-full max-w-xl">
+                    <div class="relative w-full">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name or kabupaten..." 
+                            class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-medium">
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <button type="submit" class="hidden">Search</button>
+                </form>
+            </div>
+
+            <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[11px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest whitespace-nowrap">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                Tambah
+                Tambah Lokasi
             </button>
         </div>
 
@@ -61,10 +78,10 @@
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        @foreach ($lokasi as $item)
+                    <tbody class="divide-y divide-gray-50 whitespace-nowrap font-bold">
+                        @forelse ($lokasi as $item)
                         <tr class="hover:bg-gray-50/30 transition-colors group">
-                            <td class="px-8 py-5 text-gray-400 font-medium">{{ $loop->iteration }}</td>
+                            <td class="px-8 py-5 text-gray-400 font-medium">{{ ($lokasi->currentPage() - 1) * $lokasi->perPage() + $loop->iteration }}</td>
                             <td class="px-8 py-5 text-[#0B224E] font-bold capitalize">{{ $item->name }}</td>
                             <td class="px-8 py-5 text-gray-500 font-medium uppercase tracking-widest">{{ $item->Kabupaten }}</td>
                             <td class="px-8 py-5 text-right font-normal">
@@ -86,15 +103,22 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="4" class="px-8 py-10 text-center text-gray-400 italic">No locations found.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
             
-            <div class="px-8 py-6 bg-white border-t border-gray-50 flex items-center justify-between">
-                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">Showing 1 to {{ $lokasi->count() }} of {{ $lokasi->count() }} entities</p>
-                <div class="flex items-center gap-2">
-                    <button class="w-8 h-8 rounded-lg bg-[#1A337E] text-white text-[11px] font-bold shadow-sm">1</button>
+            <!-- Pagination -->
+            <div class="px-8 py-6 bg-white border-t border-gray-50 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">
+                    Showing {{ $lokasi->firstItem() ?? 0 }} to {{ $lokasi->lastItem() ?? 0 }} of {{ $lokasi->total() }} entities
+                </p>
+                <div class="custom-pagination">
+                    {{ $lokasi->appends(request()->query())->links('pagination::tailwind') }}
                 </div>
             </div>
         </div>

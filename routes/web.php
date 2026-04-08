@@ -7,6 +7,9 @@ use App\Http\Controllers\roleController;
 use App\Http\Controllers\usersController;
 use App\Http\Controllers\picController;
 use App\Http\Controllers\packageController;
+use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\KasirController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -21,9 +24,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Admin Routes
     Route::middleware(['role:admin'])->prefix('admin')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('Admin.Dashboard');
-        })->name('admin.dashboard');
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::get('/lokasi', [lokasiController::class, 'index'])->name('admin.lokasi.index');
         Route::get('/lokasi/create', [lokasiController::class, 'create'])->name('admin.lokasi.create');
         Route::post('/lokasi', [lokasiController::class, 'store'])->name('admin.lokasi.store');
@@ -63,9 +64,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Kasir Routes
     Route::middleware(['role:kasir'])->prefix('kasir')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('Kasir.dashboard');
-        })->name('kasir.dashboard');
+        Route::get('/dashboard', [KasirController::class, 'dashboard'])->name('kasir.dashboard');
 
         Route::get('/transaksi', [App\Http\Controllers\transaksiController::class, 'index'])->name('kasir.transaksi.index');
         Route::post('/transaksi', [App\Http\Controllers\transaksiController::class, 'store'])->name('admin.transactions.store');
@@ -78,9 +77,18 @@ Route::middleware(['auth'])->group(function () {
 
     // Owner Routes
     Route::middleware(['role:owner'])->prefix('owner')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('Owner.Dashboard');
-        })->name('owner.dashboard');
+        Route::get('/dashboard', [OwnerController::class, 'dashboard'])->name('owner.dashboard');
+        
+        Route::prefix('audit')->group(function () {
+            Route::get('/transactions', [OwnerController::class, 'transactionAudit'])->name('owner.audit.transaksi');
+            Route::get('/transactions/export', [OwnerController::class, 'exportTransactions'])->name('owner.audit.transactions.export');
+            
+            Route::get('/users', [OwnerController::class, 'usersAudit'])->name('owner.audit.users');
+            Route::post('/users/{id}/toggle', [OwnerController::class, 'toggleUserStatus'])->name('owner.audit.users.toggle');
+            
+            Route::get('/assets/packages', [OwnerController::class, 'auditAssetsPackages'])->name('owner.audit.packages');
+            Route::get('/assets/photographers', [OwnerController::class, 'auditAssetsPhotographer'])->name('owner.audit.photographers');
+        });
     });
 
 });

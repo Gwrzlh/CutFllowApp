@@ -18,4 +18,9 @@ class photographer extends Model
     {
         return $this->belongsTo(lokasi::class, 'location_id', 'id');
     }
+
+    public function Transaction()
+    {
+        return $this->hasMany(Transaction::class, 'photographer_id', 'id');
+    }
 }

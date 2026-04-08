@@ -9,18 +9,19 @@
         name: '{{ old('name') }}',
         email: '{{ old('email') }}',
         password: '',
-        role_id: '{{ old('role_id') }}'
+        role_id: '{{ old('role_id') }}',
+        status: '{{ old('status') ?? 'active' }}'
     },
     actionUrl: '{{ old('id') ? route('admin.users.update', old('id')) : route('admin.users.store') }}',
     editItem(item) {
         this.mode = 'edit';
-        this.formData = { id: item.id, name: item.name, email: item.email, password: '', role_id: item.role_id };
-        this.actionUrl = '{{ url('admin/users') }}/' + item.id;
+        this.formData = { id: item.id, name: item.name, email: item.email, password: '', role_id: item.role_id, status: item.status };
+        this.actionUrl = '{{ route('admin.users.index') }}/' + item.id;
         this.openDrawer = true;
     },
     createItem() {
         this.mode = 'create';
-        this.formData = { id: '', name: '', email: '', password: '', role_id: '' };
+        this.formData = { id: '', name: '', email: '', password: '', role_id: '', status: 'active' };
         this.actionUrl = '{{ route('admin.users.store') }}';
         this.openDrawer = true;
     }
@@ -40,13 +41,39 @@
 
     <!-- Data Card -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-sm">
-        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white">
-            <h2 class="font-bold text-[#0B224E]">List Users</h2>
-            <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[13px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="px-8 py-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white">
+            <div class="flex flex-col md:flex-row items-center gap-4 flex-1">
+                <h2 class="font-bold text-[#0B224E] whitespace-nowrap">List Users</h2>
+                
+                <!-- Search & Filter Form -->
+                <form action="{{ route('admin.users.index') }}" method="GET" class="flex flex-col md:flex-row items-center gap-3 w-full max-w-2xl">
+                    <div class="relative w-full">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name or email..." 
+                            class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-medium">
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <select name="role_id" onchange="this.form.submit()" 
+                        class="w-full md:w-48 px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all appearance-none cursor-pointer">
+                        <option value="">All Roles</option>
+                        @foreach($role as $r)
+                            <option value="{{ $r->id }}" {{ request('role_id') == $r->id ? 'selected' : '' }}>{{ $r->name }}</option>
+                        @endforeach
+                    </select>
+
+                    <button type="submit" class="hidden">Search</button>
+                </form>
+            </div>
+
+            <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[11px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest whitespace-nowrap">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                Tambah
+                Tambah User
             </button>
         </div>
 
@@ -58,13 +85,14 @@
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">No</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">User Information</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Role</th>
+                            <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Status</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 font-medium">
-                        @foreach ($user as $item)
+                    <tbody class="divide-y divide-gray-50 font-medium whitespace-nowrap">
+                        @forelse ($user as $item)
                         <tr class="hover:bg-gray-50/30 transition-colors group">
-                            <td class="px-8 py-5 text-gray-400 font-medium">{{ $loop->iteration }}</td>
+                            <td class="px-8 py-5 text-gray-400 font-medium">{{ ($user->currentPage() - 1) * $user->perPage() + $loop->iteration }}</td>
                             <td class="px-8 py-5">
                                 <div class="flex flex-col">
                                     <span class="text-[#0B224E] font-bold text-sm tracking-tight">{{ $item->name }}</span>
@@ -72,12 +100,23 @@
                                 </div>
                             </td>
                             <td class="px-8 py-5">
-                                <span class="px-3 py-1 bg-[#1A337E]/5 text-[#1A337E] rounded-lg text-[10px] font-bold uppercase tracking-widest border border-[#1A337E]/10">
-                                    {{ $item->role->name }}
+                                <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-blue-100">
+                                    {{ $item->role->name ?? '-' }}
                                 </span>
                             </td>
+                            <td class="px-8 py-5">
+                                @if($item->status === 'active')
+                                    <span class="px-3 py-1 bg-green-50 text-green-600 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-green-100">
+                                        Active
+                                    </span>
+                                @else
+                                    <span class="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-red-100">
+                                        Inactive
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-8 py-5 text-right font-normal">
-                                <div class="flex items-center justify-end gap-3">
+                                <div class="flex items-center justify-end gap-3 font-normal">
                                     <button @click="editItem({{ json_encode($item) }})" class="p-2.5 text-gray-300 hover:text-[#1A337E] hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-gray-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1A337E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -95,15 +134,22 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-8 py-10 text-center text-gray-400 italic">No users found.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
             
-            <div class="px-8 py-6 bg-white border-t border-gray-50 flex items-center justify-between">
-                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">Showing 1 to {{ $user->count() }} of {{ $user->count() }} entities</p>
-                <div class="flex items-center gap-2">
-                    <button class="w-8 h-8 rounded-lg bg-[#1A337E] text-white text-[11px] font-bold shadow-sm">1</button>
+            <!-- Pagination -->
+            <div class="px-8 py-6 bg-white border-t border-gray-50 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">
+                    Showing {{ $user->firstItem() ?? 0 }} to {{ $user->lastItem() ?? 0 }} of {{ $user->total() }} entities
+                </p>
+                <div class="custom-pagination">
+                    {{ $user->appends(request()->query())->links('pagination::tailwind') }}
                 </div>
             </div>
         </div>
@@ -180,6 +226,17 @@
                                     @endforeach
                                 </select>
                                 @error('role_id') <p class="text-red-500 text-[11px] mt-1 italic font-medium tracking-normal normal-case font-medium">{{ $message }}</p> @enderror
+                            </div>
+
+                            <!-- Input Group -->
+                            <div class="space-y-2 uppercase tracking-[0.2em]">
+                                <label for="status" class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">User Status</label>
+                                <select name="status" id="status" x-model="formData.status"
+                                    class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E] italic" required>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                                @error('status') <p class="text-red-500 text-[11px] mt-1 italic font-medium tracking-normal normal-case font-medium">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>

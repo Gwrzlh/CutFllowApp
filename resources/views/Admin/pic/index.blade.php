@@ -14,7 +14,7 @@
     editItem(item) {
         this.mode = 'edit';
         this.formData = { id: item.id, name: item.name, phone: item.phone, location_id: item.location_id };
-        this.actionUrl = '{{ url('admin/photographer') }}/' + item.id;
+        this.actionUrl = '{{ route('admin.pic.index') }}/' + item.id;
         this.openDrawer = true;
     },
     createItem() {
@@ -39,14 +39,40 @@
     </div>
 
     <!-- Data Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-sm lowercase italic">
-        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white not-italic">
-            <h2 class="font-bold text-[#0B224E]">List PIC / Photographer</h2>
-            <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[13px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden text-sm uppercase italic">
+        <div class="px-8 py-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white not-italic">
+            <div class="flex flex-col md:flex-row items-center gap-4 flex-1">
+                <h2 class="font-bold text-[#0B224E] whitespace-nowrap">List PIC / Photographer</h2>
+                
+                <!-- Search & Filter Form -->
+                <form action="{{ route('admin.pic.index') }}" method="GET" class="flex flex-col md:flex-row items-center gap-3 w-full max-w-2xl text-left">
+                    <div class="relative w-full">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name or phone..." 
+                            class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-medium">
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <select name="location_id" onchange="this.form.submit()" 
+                        class="w-full md:w-48 px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all appearance-none cursor-pointer">
+                        <option value="">All Regions</option>
+                        @foreach($lokasi as $l)
+                            <option value="{{ $l->id }}" {{ request('location_id') == $l->id ? 'selected' : '' }}>{{ $l->Kabupaten }}</option>
+                        @endforeach
+                    </select>
+
+                    <button type="submit" class="hidden">Search</button>
+                </form>
+            </div>
+
+            <button @click="createItem()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A337E] text-white rounded-xl text-[11px] font-bold hover:bg-[#0B224E] transition-all shadow-md active:scale-95 uppercase tracking-widest whitespace-nowrap">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                Tambah
+                Tambah PIC
             </button>
         </div>
 
@@ -62,19 +88,19 @@
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 uppercase tracking-tight font-bold">
-                        @foreach ($photographer as $item)
+                    <tbody class="divide-y divide-gray-50 uppercase tracking-tight font-bold whitespace-nowrap">
+                        @forelse ($photographer as $item)
                         <tr class="hover:bg-gray-50/30 transition-colors group italic">
-                            <td class="px-8 py-5 text-gray-400 font-medium not-italic">{{ $loop->iteration }}</td>
+                            <td class="px-8 py-5 text-gray-400 font-medium not-italic">{{ ($photographer->currentPage() - 1) * $photographer->perPage() + $loop->iteration }}</td>
                             <td class="px-8 py-5 text-[#0B224E] font-bold not-italic">{{ $item->name }}</td>
                             <td class="px-8 py-5 text-gray-500 font-medium tracking-widest not-italic">{{ $item->phone }}</td>
                             <td class="px-8 py-5 not-italic uppercase tracking-widest font-bold">
                                 <span class="px-3 py-1 bg-blue-50 text-[#1A337E] rounded-full text-[10px] font-bold border border-blue-100">
-                                    {{ $item->lokasi->Kabupaten }}
+                                    {{ $item->lokasi->Kabupaten ?? '-' }}
                                 </span>
                             </td>
                             <td class="px-8 py-5 text-right font-normal not-italic">
-                                <div class="flex items-center justify-end gap-3">
+                                <div class="flex items-center justify-end gap-3 font-normal">
                                     <button @click="editItem({{ json_encode($item) }})" class="p-2.5 text-gray-300 hover:text-[#1A337E] hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-gray-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#1A337E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -92,15 +118,22 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr class="not-italic">
+                            <td colspan="5" class="px-8 py-10 text-center text-gray-400 italic">No photographers found.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
             
-            <div class="px-8 py-6 bg-white border-t border-gray-50 flex items-center justify-between">
-                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">Showing 1 to {{ $photographer->count() }} of {{ $photographer->count() }} entities</p>
-                <div class="flex items-center gap-2">
-                    <button class="w-8 h-8 rounded-lg bg-[#1A337E] text-white text-[11px] font-bold shadow-sm">1</button>
+            <!-- Pagination -->
+            <div class="px-8 py-6 bg-white border-t border-gray-50 flex flex-col md:flex-row items-center justify-between gap-4 not-italic">
+                <p class="text-[11px] text-gray-400 font-medium italic uppercase tracking-wider">
+                    Showing {{ $photographer->firstItem() ?? 0 }} to {{ $photographer->lastItem() ?? 0 }} of {{ $photographer->total() }} entities
+                </p>
+                <div class="custom-pagination">
+                    {{ $photographer->appends(request()->query())->links('pagination::tailwind') }}
                 </div>
             </div>
         </div>

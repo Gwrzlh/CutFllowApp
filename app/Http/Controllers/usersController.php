@@ -8,9 +8,25 @@ use App\Models\role;
 
 class usersController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::with('role')->get();
+        $query = User::with('role');
+
+        // Search Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Role Filter
+        if ($request->filled('role_id')) {
+            $query->where('role_id', $request->role_id);
+        }
+
+        $user = $query->paginate(10);
         $role = role::all();
         return view('Admin.users.index', compact('user', 'role'));
     }
@@ -21,6 +37,7 @@ class usersController extends Controller
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
         $user->role_id = $request->role_id;
+        $user->status = $request->status ?? 'active';
         $user->save();
         return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan');
     }
@@ -33,6 +50,7 @@ class usersController extends Controller
             $user->password = bcrypt($request->password);
         }
         $user->role_id = $request->role_id;
+        $user->status = $request->status;
         $user->save();
         return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui');
     }
