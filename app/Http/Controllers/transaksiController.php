@@ -72,7 +72,7 @@ class transaksiController extends Controller
                 'photographer_id' => $request->photographer_id,
                 'user_id' => Auth::id(),
                 'total_amount' => $total_price,
-                'amount_paid' => $request->amount_paid,
+                'amount_paid' => $request->cash_received,
                 'cash_change' => $cash_change,
                 'payment_status' => $payment_status,
                 'booking_status' => $booking_status,
