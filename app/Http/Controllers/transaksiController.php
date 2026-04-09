@@ -31,6 +31,7 @@ class transaksiController extends Controller
             'customer_name' => 'required|string|max:255',
             'package_id' => 'required|exists:packages,id',
             'photographer_id' => 'required|exists:photographers,id',
+            'location_id' => 'required|exists:locations,id',
             'execution_date' => 'required|date|after_or_equal:today',
             'amount_paid' => 'required|integer|min:0',
         ]);
@@ -77,6 +78,7 @@ class transaksiController extends Controller
                 'payment_status' => $payment_status,
                 'booking_status' => $booking_status,
                 'execution_date' => $request->execution_date,
+                'location_id' => $request->location_id,
             ]);
 
             $transaction->update(['invoice_number' => 'INV-' . str_pad($transaction->id, 5, '0', STR_PAD_LEFT)]);

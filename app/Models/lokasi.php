@@ -11,9 +11,4 @@ class lokasi extends Model
         'name',
         'Kabupaten',
     ];
-
-    public function photographer()
-    {
-        return $this->hasMany(photographer::class);
-    }
 }

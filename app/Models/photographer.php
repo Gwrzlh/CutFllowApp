@@ -10,14 +10,8 @@ class photographer extends Model
 
     protected $fillable = [
         'name',
-        'location_id',
         'phone',
     ];
-
-    public function lokasi()
-    {
-        return $this->belongsTo(lokasi::class, 'location_id', 'id');
-    }
 
     public function Transaction()
     {

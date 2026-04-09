@@ -7,19 +7,18 @@
     formData: {
         id: '{{ old('id') }}',
         name: '{{ old('name') }}',
-        phone: '{{ old('phone') }}',
-        location_id: '{{ old('location_id') }}'
+        phone: '{{ old('phone') }}'
     },
     actionUrl: '{{ old('id') ? route('admin.pic.update', old('id')) : route('admin.pic.store') }}',
     editItem(item) {
         this.mode = 'edit';
-        this.formData = { id: item.id, name: item.name, phone: item.phone, location_id: item.location_id };
+        this.formData = { id: item.id, name: item.name, phone: item.phone };
         this.actionUrl = '{{ route('admin.pic.index') }}/' + item.id;
         this.openDrawer = true;
     },
     createItem() {
         this.mode = 'create';
-        this.formData = { id: '', name: '', phone: '', location_id: '' };
+        this.formData = { id: '', name: '', phone: '' };
         this.actionUrl = '{{ route('admin.pic.store') }}';
         this.openDrawer = true;
     }
@@ -55,15 +54,6 @@
                             </svg>
                         </div>
                     </div>
-
-                    <select name="location_id" onchange="this.form.submit()" 
-                        class="w-full md:w-48 px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all appearance-none cursor-pointer">
-                        <option value="">All Regions</option>
-                        @foreach($lokasi as $l)
-                            <option value="{{ $l->id }}" {{ request('location_id') == $l->id ? 'selected' : '' }}>{{ $l->Kabupaten }}</option>
-                        @endforeach
-                    </select>
-
                     <button type="submit" class="hidden">Search</button>
                 </form>
             </div>
@@ -84,7 +74,6 @@
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">No</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Nama PIC</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Nomor Telepon</th>
-                            <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100">Lokasi</th>
                             <th class="px-8 py-4 font-bold uppercase tracking-widest border-b border-gray-100 text-right">Action</th>
                         </tr>
                     </thead>
@@ -94,11 +83,6 @@
                             <td class="px-8 py-5 text-gray-400 font-medium not-italic">{{ ($photographer->currentPage() - 1) * $photographer->perPage() + $loop->iteration }}</td>
                             <td class="px-8 py-5 text-[#0B224E] font-bold not-italic">{{ $item->name }}</td>
                             <td class="px-8 py-5 text-gray-500 font-medium tracking-widest not-italic">{{ $item->phone }}</td>
-                            <td class="px-8 py-5 not-italic uppercase tracking-widest font-bold">
-                                <span class="px-3 py-1 bg-blue-50 text-[#1A337E] rounded-full text-[10px] font-bold border border-blue-100">
-                                    {{ $item->lokasi->Kabupaten ?? '-' }}
-                                </span>
-                            </td>
                             <td class="px-8 py-5 text-right font-normal not-italic">
                                 <div class="flex items-center justify-end gap-3 font-normal">
                                     <button @click="editItem({{ json_encode($item) }})" class="p-2.5 text-gray-300 hover:text-[#1A337E] hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-gray-100">
@@ -187,22 +171,9 @@
                             <!-- Input Group -->
                             <div class="space-y-2 uppercase tracking-[0.2em]">
                                 <label for="phone" class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Nomor Telepon</label>
-                                <input type="text" name="phone" id="phone" placeholder="Contoh: 08123456789" x-model="formData.phone"
+                                <input type="number" name="phone" id="phone" placeholder="Contoh: 08123456789" x-model="formData.phone"
                                     class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E] tracking-widest" required>
                                 @error('phone') <p class="text-red-500 text-[11px] mt-1 italic font-medium">{{ $message }}</p> @enderror
-                            </div>
-
-                            <!-- Input Group -->
-                            <div class="space-y-2 uppercase tracking-[0.2em]">
-                                <label for="location_id" class="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">Assign Lokasi</label>
-                                <select name="location_id" id="location_id" x-model="formData.location_id"
-                                    class="w-full px-5 py-4 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1A337E]/10 focus:border-[#1A337E] transition-all font-semibold text-[#0B224E] italic" required>
-                                    <option value="" disabled>Pilih Lokasi</option>
-                                    @foreach ($lokasi as $l)
-                                        <option value="{{ $l->id }}">{{ $l->Kabupaten }} - {{ $l->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('location_id') <p class="text-red-500 text-[11px] mt-1 italic font-medium">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>

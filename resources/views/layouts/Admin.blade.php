@@ -30,7 +30,7 @@
     </style>
 </head>
 
-<body class="bg-[#F4F7FE] text-[#2D3436]" x-data="{ sidebarOpen: true, masterDataOpen: {{ request()->is('admin/lokasi*', 'admin/role*', 'admin/photographer*', 'admin/package*', 'admin/users*') ? 'true' : 'false' }}, transactionOpen: {{ request()->is('admin/booking*') ? 'true' : 'false' }} }">
+<body class="bg-[#F4F7FE] text-[#2D3436]" x-data="{ sidebarOpen: true, masterDataOpen: {{ request()->is('admin/lokasi*', 'admin/pic*', 'admin/package*', 'admin/users*') ? 'true' : 'false' }}, transactionOpen: {{ request()->is('admin/booking*') ? 'true' : 'false' }} }">
 
     <div class="flex h-screen overflow-hidden">
 
@@ -90,11 +90,8 @@
                             class="pl-12 space-y-1">
                             <a href="{{ route('admin.lokasi.index') }}"
                                 class="block py-2 text-sm text-gray-400 hover:text-white transition-colors {{ request()->is('admin/lokasi*') ? 'text-[#D4AF37] font-semibold' : '' }}">Lokasi</a>
-                            <a href="{{ route('admin.role.index') }}"
-                                class="block py-2 text-sm text-gray-400 hover:text-white transition-colors {{ request()->is('admin/role*') ? 'text-[#D4AF37] font-semibold' : '' }}">Role
-                                Management</a>
                             <a href="{{ route('admin.pic.index') }}"
-                                class="block py-2 text-sm text-gray-400 hover:text-white transition-colors {{ request()->is('admin/photographer*') ? 'text-[#D4AF37] font-semibold' : '' }}">Photographer</a>
+                                class="block py-2 text-sm text-gray-400 hover:text-white transition-colors {{ request()->is('admin/pic*') ? 'text-[#D4AF37] font-semibold' : '' }}">Photographer</a>
                             <a href="{{ route('admin.package.index') }}"
                                 class="block py-2 text-sm text-gray-400 hover:text-white transition-colors {{ request()->is('admin/package*') ? 'text-[#D4AF37] font-semibold' : '' }}">Package
                                 List</a>
@@ -156,13 +153,8 @@
             <!-- Page Content -->
             <main class="p-8">
                 <!-- Session Alerts (MIGRATED TO SWEETALERT in JS) -->
-
-
-
                 @yield('content')
             </main>
-
-
             <!-- Drawer Overlay (For Create/Edit) -->
             @yield('drawer')
         </div>

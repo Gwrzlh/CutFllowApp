@@ -12,7 +12,7 @@ class picController extends Controller
 {
     public function index(Request $request)
     {
-        $query = photographer::with('lokasi');
+        $query = photographer::query();
 
         // Search Filter
         if ($request->filled('search')) {
@@ -22,36 +22,26 @@ class picController extends Controller
                   ->orWhere('phone', 'LIKE', "%{$search}%");
             });
         }
-
-        // Location Filter (Kabupaten)
-        if ($request->filled('location_id')) {
-            $query->where('location_id', $request->location_id);
-        }
-
         $photographer = $query->paginate(10);
-        $lokasi = lokasi::all();
-        return view('Admin.pic.index', compact('photographer', 'lokasi'));
+        return view('Admin.pic.index', compact('photographer'));
     }
     public function create()
     {
-        $photographer = photographer::with('lokasi')->get();
-        $lokasi = lokasi::all();
-        return view('Admin.pic.create', compact('photographer', 'lokasi'));
+        $photographer = photographer::all()->paginate(5);
+        return view('Admin.pic.create', compact('photographer'));
     }
 
     public function edit($id)
     {
-        $photographer = photographer::with('lokasi')->get();
-        $lokasi = lokasi::all();
+        $photographer = photographer::all();
         $pic = photographer::find($id);
-        return view('Admin.pic.update', compact('photographer', 'lokasi', 'pic'));
+        return view('Admin.pic.update', compact('photographer', 'pic'));
     }
 
     public function store(Request $request)
     {
         $photographer = new photographer();
         $photographer->name = $request->name;
-        $photographer->location_id = $request->location_id;
         $photographer->phone = $request->phone;
         $photographer->save();
         
@@ -68,7 +58,6 @@ class picController extends Controller
     {
         $photographer = photographer::find($id);
         $photographer->name = $request->name;
-        $photographer->location_id = $request->location_id;
         $photographer->phone = $request->phone;
         $photographer->save();
         
