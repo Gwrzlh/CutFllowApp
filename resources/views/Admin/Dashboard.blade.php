@@ -8,15 +8,15 @@
             <h1 class="text-3xl font-extrabold text-[#0B224E] tracking-tight">Admin Overview</h1>
             <p class="text-sm text-gray-500 mt-1 font-medium italic">Manajemen kontrol dan statistik sistem Cutflow.</p>
         </div>
-        <div class="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+       <div class="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+            <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
             </div>
             <div class="pr-4">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Real-time Data</p>
-                <p class="text-sm font-bold text-[#0B224E]">{{ date('H:i') }} WIB</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Active Cashier</p>
+                <p class="text-sm font-bold text-[#0B224E]">{{ Auth::user()->name }}</p>
             </div>
         </div>
     </div>
