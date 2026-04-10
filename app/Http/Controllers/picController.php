@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\models\photographer;
 use App\models\lokasi;
 use App\Models\LogActivity;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
 class picController extends Controller
@@ -72,6 +73,11 @@ class picController extends Controller
     public function destroy($id)
     {
         $photographer = photographer::find($id);
+
+        if ($photographer->Transaction()->exists()) {
+            return redirect()->route('admin.pic.index')->with('error', 'PIC tidak bisa dihapus karena sudah terdaftar di transaksi');
+        }
+
         $name = $photographer->name;
         $photographer->delete();
         

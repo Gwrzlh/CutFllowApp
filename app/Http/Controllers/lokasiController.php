@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\lokasi;
 use App\Models\LogActivity;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
 class lokasiController extends Controller
@@ -57,6 +58,11 @@ class lokasiController extends Controller
     public function destroy($id)
     {
       $lokasi = lokasi::find($id);
+
+      if ($lokasi->Transaction()->exists()) {
+          return redirect()->route('admin.lokasi.index')->with('error', 'Lokasi tidak bisa dihapus karena sudah terdaftar di transaksi');
+      }
+
       $name = $lokasi->name;
       $lokasi->delete();
       

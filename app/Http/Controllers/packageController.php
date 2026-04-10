@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\packages;
 use App\Models\photographer;
 use App\Models\LogActivity;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
 class packageController extends Controller
@@ -62,6 +63,11 @@ class packageController extends Controller
     public function destroy($id)
     {
         $package = packages::find($id);
+
+        if ($package->Transaction()->exists()) {
+            return redirect()->route('admin.package.index')->with('error', 'Paket tidak bisa dihapus karena sudah terdaftar di transaksi');
+        }
+
         $name = $package->name;
         $package->delete();
         

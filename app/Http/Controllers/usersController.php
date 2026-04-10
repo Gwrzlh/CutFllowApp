@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\role;
 use App\Models\LogActivity;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
 class usersController extends Controller
@@ -73,6 +74,11 @@ class usersController extends Controller
     public function destroy($id)
     {
         $user = User::find($id);
+
+        if ($user->transactions()->exists()) {
+            return redirect()->route('admin.users.index')->with('error', 'User tidak bisa dihapus karena sudah terdaftar di transaksi');
+        }
+
         $name = $user->name;
         $user->delete();
         

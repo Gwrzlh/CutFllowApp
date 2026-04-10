@@ -11,4 +11,9 @@ class lokasi extends Model
         'name',
         'Kabupaten',
     ];
+    public function Transaction()
+    {
+        return $this->hasMany(Transaction::class, 'location_id', 'id');
+    }
 }
+
