@@ -330,7 +330,7 @@
                 </form>
 
                 <!-- Hidden form for Cancel -->
-                <form x-ref="cancelForm" :action="selectedTx ? '{{ url('admin/transactions/cancel') }}/' + selectedTx.id : ''" method="POST" class="hidden" onsubmit="return confirm('Bagian Kasir: Batalkan booking ini? Dana DP dikembalikan 75% untuk customer.')">
+                <form x-ref="cancelForm" :action="'/kasir/transaksi/' + (selectedTx ? selectedTx.id : '') + '/cancel'" method="POST" class="hidden" onsubmit="return confirm('Bagian Kasir: Batalkan booking ini? Dana DP dikembalikan 75% untuk customer.')">
                     @csrf
                     @method('PUT')
                 </form>

@@ -73,7 +73,7 @@ class transaksiController extends Controller
                 'photographer_id' => $request->photographer_id,
                 'user_id' => Auth::id(),
                 'total_amount' => $total_price,
-                'amount_paid' => $request->cash_received,
+                'amount_paid' => $request->amount_paid,
                 'cash_change' => $cash_change,
                 'payment_status' => $payment_status,
                 'booking_status' => $booking_status,
@@ -144,7 +144,7 @@ class transaksiController extends Controller
             
             // Update data yang sudah ada
             $transaction->update([
-                'amount_paid' => $transaction->amount_paid + $request->amount_paid,
+                'amount_paid' => $transaction->total_amount, // Set ke total harga karena sudah lunas
                 'payment_status' => 'paid_off',
                 'booking_status' => 'completed',
                 'cash_change' => ($request->cash_received ?? $request->amount_paid) - $request->amount_paid,
